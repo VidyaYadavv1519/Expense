@@ -1,0 +1,156 @@
+{% extends 'myapp/base.html' %}
+{% load humanize %}
+
+{% block body %}
+<h1></h1>
+<form class="shadow-lg m-10 form-control-lg" method="post">
+    {% csrf_token %}
+    <div class="form-container px-10 py-10 mb-5 d-flex flex-row">
+        
+            <div class="m-4">
+                <div >
+                    <label>Expense Name</label>
+                </div>
+                <div class="border">{{ expense_form.name}}</div>
+
+            </div>
+
+            <div class="m-4">
+                <div >
+                    <label>Amount</label>
+                </div>
+                <div class="border">{{expense_form.amount}}</div>
+
+            </div>
+
+            <div class="m-4">
+                <div >
+                    <label>Category</label>
+                </div>
+                <div class="border">{{ expense_form.category}}</div>
+
+            </div>
+            
+            <div class="m-4">
+                <button class="bg-info p-2 px-5 py-2 rounded-lg font-bold text-white m-4">Add</button>
+
+            </div>
+        
+
+    </div>
+
+</form>
+<div>Expenses</div>
+<div class="shadow-lg m-10 rounded-lg ">
+    <div class="expense-header flex flex-wrap mb-2 m-10 space-x-40">
+        <span>Name</span>
+        <span>Amount</span>
+        <span>Category</span>
+        <span>Date</span>
+        <span>Edit</span>
+        <span>Delete</span>
+    </div>
+    <hr class="m-5">
+    {% for expense in expenses%}
+    <div class="expense-row m-2 ">
+        <span class="font-weight-bold">{{expense.name}}</span>
+        <span class="font-weight-bold">{{expense.amount|intcomma}}</span>
+        <span class="font-weight-bold">{{expense.category}}</span>
+        <span class="font-weight-bold">{{expense.date}}</span>
+        <span class="font-weight-bold"><a href="{% url 'edit' expense.id %}">Edit</a></span>
+        <span class="font-weight-bold">
+            <form method="post" action="{% url 'delete' expense.id %}">
+                {% csrf_token %}
+                <button type="submit" name="delete">
+                    Delete
+                </button>
+            </form>
+        </span>
+
+    </div>
+    {% endfor %} 
+
+    <span class="text-green">
+        Total amount:{{total_expenses.amount__sum|intcomma}}
+    </span>
+
+</div>
+
+<div>
+    <div class="shadow-lg ml-10 rounded-lg">
+        <h5>LAST 365 DAYS</h5>
+        <h5 class="">
+            {{yearly_sum.amount__sum|intcomma}}
+        </h5>
+
+    </div>
+    <div class="shadow-lg ml-10 rounded-lg">
+        <h5>LAST 30 DAYS</h5>
+        <h5 class="">
+            {{monthly_sum.amount__sum|intcomma}}
+        </h5>
+
+    </div>
+    <div class="shadow-lg ml-10 rounded-lg">
+        <h5>LAST 7 DAYS</h5>
+        <h5 class="">
+            {{weekly_sum.amount__sum|intcomma}}
+        </h5>
+
+    </div>
+</div>
+
+<div class="flex">
+    <div class="shadow-lg m-5">
+        <div>
+            <span>Past 30 days expenses</span>
+        </div>
+        <hr>
+        <div id="30-day-table">
+            {% for daily_sum in daily_sums %}
+                <div class="flex">
+                    <span>
+                        {{daily_sum.date}}
+                    </span>
+                </div>
+                <div>
+                    <span class="text-green">
+                        {{daily_sum.sum}}
+                    </span>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+    <div class="shadow-lg m-5">
+        <div>
+            <span>Categorical expenses</span>
+        </div>
+        <hr>
+        <div id="cat-sum-table">
+            {% for categorical_sum in categorical_sums %}
+                <div class="flex">
+                    <span>
+                        {{categorical_sum.category}}
+                    </span>
+                </div>
+                <div>
+                    <span class="text-green">
+                        {{categorical_sum.sum|intcomma}}
+                    </span>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+{% endblock %}
